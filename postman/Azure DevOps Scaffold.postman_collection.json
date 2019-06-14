@@ -1,0 +1,282 @@
+{
+	"info": {
+		"_postman_id": "b8371652-6bdf-4e97-986d-5b1ad2a2c277",
+		"name": "Azure DevOps Scaffold",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9e5d4e3d-0d9a-4afa-9e80-f847fb8fcd35",
+						"exec": [
+							"pm.test(\"Status code is 202\", function () {\r",
+							"    pm.response.to.have.status(202);\r",
+							"    \r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"project_id\", jsonData.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "7qrst77gjxi5caaqa5kb4tmgg7xckjbtzu5yhweobfih3kqer3aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{project}}\",\r\n  \"description\": \"Auto-generated demo project\",\r\n  \"capabilities\": {\r\n    \"versioncontrol\": {\r\n      \"sourceControlType\": \"Git\"\r\n    },\r\n    \"processTemplate\": {\r\n      \"templateTypeId\": \"adcc42ab-9882-485e-a3ed-7678f01f66bc\"\r\n    }\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "https://dev.azure.com/{{organization}}/_apis/projects?api-version=5.0",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{organization}}",
+						"_apis",
+						"projects"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "5.0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ensure Project Created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9e5d4e3d-0d9a-4afa-9e80-f847fb8fcd35",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is succeeded\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.status != \"succeeded\"){\r",
+							"        setTimeout(function(){}, 2000);\r",
+							"        pm.setNextRequest(\"Ensure Project Created\");\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "7qrst77gjxi5caaqa5kb4tmgg7xckjbtzu5yhweobfih3kqer3aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://dev.azure.com/{{organization}}/_apis/operations/{{project_id}}?api-version=5.0",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{organization}}",
+						"_apis",
+						"operations",
+						"{{project_id}}"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "5.0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Default Repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9e5d4e3d-0d9a-4afa-9e80-f847fb8fcd35",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    \r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"repository_url\", jsonData.remoteUrl);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "762kzl6ps6gzze2ld7kqujj6ix5fiuiuwthuomsqatfdl5m7wiaa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"docs\",\r\n  \"project\": {\r\n  \t\"id\":\"{{project_id}}\",\r\n    \"name\": \"{{project}}\"\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "https://dev.azure.com/{{organization}}/{{project}}/_apis/git/repositories?api-version=5.0",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{organization}}",
+						"{{project}}",
+						"_apis",
+						"git",
+						"repositories"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "5.0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import Github Repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9e5d4e3d-0d9a-4afa-9e80-f847fb8fcd35",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "762kzl6ps6gzze2ld7kqujj6ix5fiuiuwthuomsqatfdl5m7wiaa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"parameters\": {\r\n    \"gitSource\": {\r\n      \"url\": \"https://github.com/bgener/azure-devops-scaffold.git\"\r\n    }\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "https://dev.azure.com/{{organization}}/{{project}}/_apis/git/repositories/{{project}}/importRequests?api-version=5.0-preview.1",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{organization}}",
+						"{{project}}",
+						"_apis",
+						"git",
+						"repositories",
+						"{{project}}",
+						"importRequests"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "5.0-preview.1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
